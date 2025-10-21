@@ -113,7 +113,8 @@ namespace LiveStreamIntegration
             { 
                 if (_instance is null)
                 {
-                    _instance = new EffectAfterTime();
+                    GameObject thisThing = new GameObject("EffectAfterTime");
+                    _instance = thisThing.AddComponent<EffectAfterTime>();
                 }
                 return _instance; 
             } 
@@ -126,6 +127,7 @@ namespace LiveStreamIntegration
         {
             var effectToAdd = new KeyValuePair<MethodInfo, Timer>(effect, new Timer());
             effectToAdd.Value.StartTimer(time);
+            effectList.Add(effectToAdd);
         }
         public void FixedUpdate()
         {

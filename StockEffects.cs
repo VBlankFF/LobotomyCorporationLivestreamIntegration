@@ -37,6 +37,10 @@ namespace LiveStreamIntegration
             effects.Add(wanderAgent);
             Effect uncancelableWork = new Effect(typeof(EffectDefinitions).GetMethod("NoWorkCancel", BindingFlags.Static | BindingFlags.Public), "Can't cancel work 3m");
             effects.Add(uncancelableWork);
+            Effect overloads = new Effect(typeof(EffectDefinitions).GetMethod("RandomOverloads", BindingFlags.Static | BindingFlags.Public), "5 random overloads");
+            effects.Add(overloads);
+            /*Effect causeFear = new Effect(typeof(EffectDefinitions).GetMethod("CauseFearToAll", BindingFlags.Static | BindingFlags.Public), "Scare all agents");
+            effects.Add(causeFear);*/
             return;
         }
         public static void NoBullets()
@@ -84,6 +88,10 @@ namespace LiveStreamIntegration
         public static void NoWorkCancelEnd()
         {
             SefiraBossManager.Instance.SetWorkCancelableState(true);
+        }
+        public static void RandomOverloads()
+        {
+            CreatureOverloadManager.instance.ActivateOverload(5, OverloadType.DEFAULT, 60f);
         }
     }
     public class WideBuf : UnitBuf
