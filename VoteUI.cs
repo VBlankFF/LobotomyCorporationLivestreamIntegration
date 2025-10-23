@@ -58,7 +58,11 @@ namespace LiveStreamIntegration
                 voteOptions[1].voteOptionRowObj.transform.SetParent(voteCanvasObject.transform);
                 voteOptions[2] = new VoteOptionRow("3", "Option3", new Vector2(Screen.width - 290, 35));
                 voteOptions[2].voteOptionRowObj.transform.SetParent(voteCanvasObject.transform);
-                Harmony_Patch.UpdateVoteUINames();
+                GameObject voteTimerObj = new GameObject("VoteTimerManager");
+                VoteTimer timer =  voteTimerObj.AddComponent<VoteTimer>();
+                voteTimerObj.transform.SetParent(voteCanvasObject.transform);
+                timer.votingUI = this;
+
             }
             catch (Exception ex)
             {
@@ -130,10 +134,7 @@ namespace LiveStreamIntegration
                 this.numVotes.text = "(" + numVotes + ")";
             }
         }
-        public void FixedUpdate()
-        {
-            DoTime();
-        }
+        
         // This could really be better
         public void DoTime()
         {
@@ -153,10 +154,19 @@ namespace LiveStreamIntegration
             {
                 Harmony_Patch.OnVoteTimerEnd();
             }
+            SetDisplayVoteTime((int)voteTime);
         }
         public void SetDisplayVoteTime(int voteTime)
         {
             timerText.text = "(" + voteTime.ToString() + ")";
+        }
+    }
+    public class VoteTimer : MonoBehaviour
+    {
+        public VoteUI votingUI;
+        public void FixedUpdate()
+        {
+            votingUI.DoTime();
         }
     }
 }

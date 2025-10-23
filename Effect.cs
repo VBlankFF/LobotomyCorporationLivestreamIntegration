@@ -17,7 +17,8 @@ namespace LiveStreamIntegration
         public MethodInfo effectMethod;
         // The name to be displayed when this effect is a votable option
         public string name;
-        // If this effect can currently show up as an option for voting
+        // If this effect can currently show up as an option for voting. This is intented to be used for a config, so you should avoid setting it yourself
+        // outside of the constructor.
         public bool isEnabled;
         // Description of the Effect (currently unused)
         public string description;
@@ -45,6 +46,26 @@ namespace LiveStreamIntegration
             this.isEnabled = isEnabled;
             this.description = description;
             this.votableCondition = votableCondition;
+        }
+        public string GetName()
+        {
+            return name;
+        }
+        public MethodInfo GetEffectMethod()
+        {
+            return effectMethod;
+        }
+        public bool IsEnabled()
+        {
+            return isEnabled;
+        }
+        public string GetDescription()
+        {
+            return description;
+        }
+        public MethodInfo GetVotableCondition()
+        {
+            return votableCondition;
         }
         /* Loads every dll in the Effects folder and adds their Effects to the list. If you are making a dll to add to the folder, ensure you have an
          EffectDefinitions class with a GetEffects method that returns an IEnumerable of Effects.*/
@@ -110,11 +131,11 @@ namespace LiveStreamIntegration
          This is reevaluated every time the selection changes, so the conditions can be things that change mid-day.*/
         public bool IsVotable()
         {
-            if (votableCondition is null)
+            if (GetVotableCondition() is null)
             {
                 return true;
             }
-            return isEnabled && (bool)votableCondition.Invoke(this, null);
+            return isEnabled && (bool)GetVotableCondition().Invoke(this, null);
         }
     }
     /* This will run a method after a given amount of ingame time passes. Useful if you need to undo an Effect after a certain amount of time.
@@ -151,7 +172,7 @@ namespace LiveStreamIntegration
             effectToAdd.Value.StartTimer(time);
             effectList.Add(effectToAdd);
         }
-        // This runs the timers on the Effects and runs them when they expire.
+        // This runs the timers on the Effects and invokes their method when the time expires.
         public void FixedUpdate()
         {
             foreach (var effect in effectList)

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
+using System.Text;
 using UnityEngine;
+using static RandomEventBase;
 
 namespace LiveStreamIntegration
 {
@@ -35,12 +36,15 @@ namespace LiveStreamIntegration
             effects.Add(noPause);
             Effect wanderAgent = new Effect(typeof(EffectDefinitions).GetMethod("RandomWander", BindingFlags.Static | BindingFlags.Public), "Wandering agents");
             effects.Add(wanderAgent);
-            Effect uncancelableWork = new Effect(typeof(EffectDefinitions).GetMethod("NoWorkCancel", BindingFlags.Static | BindingFlags.Public), "Can't cancel work 3m");
+            // The name can't be much longer than this without it either taking 2 lines or overlapping the vote number (neither looks good)
+            Effect uncancelableWork = new Effect(typeof(EffectDefinitions).GetMethod("NoWorkCancel", BindingFlags.Static | BindingFlags.Public), "Can't cancel work for 3m");
             effects.Add(uncancelableWork);
             Effect overloads = new Effect(typeof(EffectDefinitions).GetMethod("RandomOverloads", BindingFlags.Static | BindingFlags.Public), "5 random overloads");
             effects.Add(overloads);
             /*Effect causeFear = new Effect(typeof(EffectDefinitions).GetMethod("CauseFearToAll", BindingFlags.Static | BindingFlags.Public), "Scare all agents");
             effects.Add(causeFear);*/
+            Effect fakeDeath = new Effect(typeof(EffectDefinitions).GetMethod("FakeDeath", BindingFlags.Static | BindingFlags.Public), "Fake death");
+            effects.Add(fakeDeath);
             return;
         }
         public static void NoBullets()
@@ -92,6 +96,36 @@ namespace LiveStreamIntegration
         public static void RandomOverloads()
         {
             CreatureOverloadManager.instance.ActivateOverload(5, OverloadType.DEFAULT, 60f);
+        }
+        public static void FakeDeath()
+        {
+            IList<AgentModel> agentList = AgentManager.instance.GetAgentList();
+            AgentModel fakeDeadAgent = agentList[UnityEngine.Random.Range(0, agentList.Count)];
+            SefiraMessage sefiraMessage = new SefiraMessage();
+            string d = sefiraMessage.desc;
+            Sefira agentSefira = fakeDeadAgent.GetCurrentSefira();
+            int sefiraIndex = agentSefira.index;
+            if (SefiraConversationController.Instance.CheckMuted(sefiraIndex))
+            {
+                return;
+            }
+            bool isRobot = MissionManager.instance.ExistsFinishedBossMission(fakeDeadAgent.GetCurrentSefira().sefiraEnum);
+            if (sefiraIndex == 5 ||  sefiraIndex == 6)
+            {
+                int tiphType = UnityEngine.Random.Range(0, 2);
+                sefiraIndex = tiphType != 0 ? 6 : 5;
+                d = Conversation.instance.GetSefiraMessage(sefiraIndex, 1, tiphType, isRobot).desc.Replace("#0", "<color=#66bfcd>" + fakeDeadAgent.name + "</color>");
+            }
+            else
+            {
+                d = Conversation.instance.GetSefiraMessage(sefiraIndex, 1, isRobot).desc.Replace("#0", "<color=#66bfcd>" + fakeDeadAgent.name + "</color>");
+            }
+           
+            if (SefiraBossManager.Instance.IsAnyBossSessionActivated() || PlayerModel.instance.GetDay() >= 45 || MissionManager.instance.ExistsBossMission(agentSefira.sefiraEnum))
+                return;
+            string name = agentSefira.name;
+            SefiraConversationController.Instance.UpdateConversation(CharacterResourceDataModel.instance.GetSefiraPortrait(agentSefira.sefiraEnum, false), CharacterResourceDataModel.instance.GetColor(name), d);
+            AngelaConversation.instance.MakeDefaultFormatMessage(AngelaMessageState.AGENT_DEAD_HEALTH, (object)fakeDeadAgent);
         }
     }
     public class WideBuf : UnitBuf
