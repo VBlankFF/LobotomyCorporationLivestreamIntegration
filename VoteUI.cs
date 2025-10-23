@@ -15,6 +15,7 @@ namespace LiveStreamIntegration
         public Text timerText;
         public GameObject topTextObject;
         public VoteOptionRow[] voteOptions;
+        public float voteTime;
         public void Init()
         {
             try
@@ -129,7 +130,31 @@ namespace LiveStreamIntegration
                 this.numVotes.text = "(" + numVotes + ")";
             }
         }
-        public void SetVoteTime(int voteTime)
+        public void FixedUpdate()
+        {
+            DoTime();
+        }
+        // This could really be better
+        public void DoTime()
+        {
+            if (!Harmony_Patch.isVotingActive)
+            {
+                return;
+            }
+            if (Harmony_Patch.isVotingTimeInRealTime)
+            {
+                voteTime -= Time.fixedDeltaTime;
+            }    
+            else
+            {
+                voteTime -= Time.deltaTime;
+            }
+            if (voteTime <= 0)
+            {
+                Harmony_Patch.OnVoteTimerEnd();
+            }
+        }
+        public void SetDisplayVoteTime(int voteTime)
         {
             timerText.text = "(" + voteTime.ToString() + ")";
         }
