@@ -103,4 +103,48 @@ namespace LiveStreamIntegration
             }
         }
     }
+    // This will run a method after a given amount of ingame time passes. Useful if you need to undo an Effect after a certain amount of time.
+    public class EffectAfterTime : MonoBehaviour 
+    {
+        public static List<KeyValuePair<MethodInfo, Timer>> effectList;
+        private static EffectAfterTime _instance;
+        public static EffectAfterTime instance {  
+            get 
+            { 
+                if (_instance is null)
+                {
+                    GameObject thisThing = new GameObject("EffectAfterTime");
+                    _instance = thisThing.AddComponent<EffectAfterTime>();
+                }
+                return _instance; 
+            } 
+        }
+        // You don't need to make your own EffectAfterTime, use AddEffect instead.
+        public EffectAfterTime()
+        {
+            if (_instance is null)
+            {
+                effectList = new List<KeyValuePair<MethodInfo, Timer>>();
+            }
+        }
+        // Call from your Effect to add a method to run after the given amount of time.
+        public void AddEffect(MethodInfo effect, float time)
+        {
+            var effectToAdd = new KeyValuePair<MethodInfo, Timer>(effect, new Timer());
+            effectToAdd.Value.StartTimer(time);
+            effectList.Add(effectToAdd);
+        }
+        // This runs the timers on the Effects and runs them when they expire.
+        public void FixedUpdate()
+        {
+            foreach (var effect in effectList)
+            {
+                if (effect.Value.RunTimer())
+                {
+                    effect.Key.Invoke(null, null);
+                    effectList.Remove(effect);
+                }
+            }
+        }
+    }
 }

@@ -51,11 +51,11 @@ namespace LiveStreamIntegration
                 timerText.alignment = TextAnchor.LowerCenter;
                 voteCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
                 voteOptions = new VoteOptionRow[Constants.NUM_VOTING_OPTIONS];
-                voteOptions[0] = new VoteOptionRow("1", "Option1", new Vector2(Screen.width - 270, 85));
+                voteOptions[0] = new VoteOptionRow("1", "Option1", new Vector2(Screen.width - 290, 85));
                 voteOptions[0].voteOptionRowObj.transform.SetParent(voteCanvasObject.transform);
-                voteOptions[1] = new VoteOptionRow("2", "Option2", new Vector2(Screen.width - 270, 60));
+                voteOptions[1] = new VoteOptionRow("2", "Option2", new Vector2(Screen.width - 290, 60));
                 voteOptions[1].voteOptionRowObj.transform.SetParent(voteCanvasObject.transform);
-                voteOptions[2] = new VoteOptionRow("3", "Option3", new Vector2(Screen.width - 270, 35));
+                voteOptions[2] = new VoteOptionRow("3", "Option3", new Vector2(Screen.width - 290, 35));
                 voteOptions[2].voteOptionRowObj.transform.SetParent(voteCanvasObject.transform);
                 Harmony_Patch.UpdateVoteUINames();
             }
@@ -98,13 +98,13 @@ namespace LiveStreamIntegration
                 optionNameTrans.SetParent(voteOptionRowObj.transform);
                 optionIdTrans.offsetMax = new Vector2(30, 30);
                 numVotesTrans.offsetMax = new Vector2(50, 30);
-                optionNameTrans.offsetMax = new Vector2(200, 30);
+                optionNameTrans.offsetMax = new Vector2(260, 30);
                 optionIdTrans.offsetMin = new Vector2(0, -30);
                 numVotesTrans.offsetMin = new Vector2(0, -30);
                 optionNameTrans.offsetMin = new Vector2(0, -30);
                 optionIdTrans.localPosition = new Vector3();
-                numVotesTrans.localPosition = new Vector3(240, 0);
-                optionNameTrans.localPosition = new Vector3(110, 0);
+                numVotesTrans.localPosition = new Vector3(260, 0);
+                optionNameTrans.localPosition = new Vector3(140, 0);
                 optionId.text = strOptionId + ":";
                 numVotes.text = "(0)";
                 optionName.text = "null";
