@@ -152,7 +152,7 @@ namespace LiveStreamIntegration
             }
             for (int i = 0; i < Constants.NUM_VOTING_OPTIONS; i++)
             {
-                votingUI.voteOptions[i].SetName(currentVotableEffects[i].name);
+                votingUI.voteOptions[i].SetName(currentVotableEffects[i].GetName());
             }
         }
         public static Effect[] ChooseNewVotableEffects()
@@ -188,7 +188,7 @@ namespace LiveStreamIntegration
                     votesForHighest = recordedOptionVotes[i];
                 }
             }
-            highestEffect.effectMethod.Invoke(null, null);
+            highestEffect.GetEffectMethod().Invoke(null, null);
         }
     }
 }
