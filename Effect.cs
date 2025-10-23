@@ -119,16 +119,22 @@ namespace LiveStreamIntegration
                 return _instance; 
             } 
         }
+        // You don't need to make your own EffectAfterTime, use AddEffect instead.
         public EffectAfterTime()
         {
-            effectList = new List<KeyValuePair<MethodInfo, Timer>>();
+            if (_instance is null)
+            {
+                effectList = new List<KeyValuePair<MethodInfo, Timer>>();
+            }
         }
+        // Call from your Effect to add a method to run after the given amount of time.
         public void AddEffect(MethodInfo effect, float time)
         {
             var effectToAdd = new KeyValuePair<MethodInfo, Timer>(effect, new Timer());
             effectToAdd.Value.StartTimer(time);
             effectList.Add(effectToAdd);
         }
+        // This runs the timers on the Effects and runs them when they expire.
         public void FixedUpdate()
         {
             foreach (var effect in effectList)

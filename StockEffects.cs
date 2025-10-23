@@ -104,7 +104,7 @@ namespace LiveStreamIntegration
         {
             base.Init(model);
             Vector3 unitScale = (this.model as AgentModel).GetWorkerUnit().animRoot.transform.localScale;
-            (this.model as AgentModel).GetWorkerUnit().animRoot.transform.localScale = new Vector3(unitScale.x * 3, unitScale.y, unitScale.z);
+            (this.model as AgentModel).GetWorkerUnit().animRoot.transform.localScale = new Vector3(unitScale.x * 5, unitScale.y, unitScale.z);
         }
         public override void OnDestroy()
         {
@@ -113,7 +113,7 @@ namespace LiveStreamIntegration
                 return;
             }
             Vector3 unitScale = (this.model as AgentModel).GetWorkerUnit().animRoot.transform.localScale;
-            (this.model as AgentModel).GetWorkerUnit().animRoot.transform.localScale = new Vector3(unitScale.x / 3, unitScale.y, unitScale.z);
+            (this.model as AgentModel).GetWorkerUnit().animRoot.transform.localScale = new Vector3(unitScale.x / 5, unitScale.y, unitScale.z);
             base.OnDestroy();
         }
     }
