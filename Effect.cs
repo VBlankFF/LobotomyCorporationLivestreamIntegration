@@ -13,7 +13,7 @@ namespace LiveStreamIntegration
      */
     public class Effect
     {
-        // The method to be run when this Effect activates
+        // The method to be run when this Effect activates. The method should be static.
         public MethodInfo effectMethod;
         // The name to be displayed when this effect is a votable option
         public string name;
@@ -21,6 +21,9 @@ namespace LiveStreamIntegration
         public bool isEnabled;
         // Description of the Effect (currently unused)
         public string description;
+        /* The condition that must be true for an Effect to be selected for voting. if null, is always votable (if enabled). The method should (probably) be static.
+        This is reevaluated every time the selection changes, so the conditions can be things that change mid-day.*/
+        public MethodInfo votableCondition;
         public Effect(MethodInfo effectMethod, string name)
         {
             this.effectMethod = effectMethod;
@@ -35,12 +38,13 @@ namespace LiveStreamIntegration
             this.isEnabled = isEnabled;
             this.description = "No description";
         }
-        public Effect(MethodInfo effectMethod, string name, bool isEnabled, string description)
+        public Effect(MethodInfo effectMethod, string name, bool isEnabled = true, string description = "No description", MethodInfo votableCondition = null)
         {
             this.effectMethod = effectMethod;
             this.name = name;
             this.isEnabled = isEnabled;
             this.description = description;
+            this.votableCondition = votableCondition;
         }
         /* Loads every dll in the Effects folder and adds their Effects to the list. If you are making a dll to add to the folder, ensure you have an
          EffectDefinitions class with a GetEffects method that returns an IEnumerable of Effects.*/
@@ -102,8 +106,21 @@ namespace LiveStreamIntegration
                 Harmony_Patch.effects.Add(eff);
             }
         }
+        /* Checks if votableCondition is true. Returns true if it is or if there is no votableCondition.
+         This is reevaluated every time the selection changes, so the conditions can be things that change mid-day.*/
+        public bool IsVotable()
+        {
+            if (votableCondition is null)
+            {
+                return true;
+            }
+            return isEnabled && (bool)votableCondition.Invoke(this, null);
+        }
     }
-    // This will run a method after a given amount of ingame time passes. Useful if you need to undo an Effect after a certain amount of time.
+    /* This will run a method after a given amount of ingame time passes. Useful if you need to undo an Effect after a certain amount of time.
+     * Note: I'm pretty sure this is destroyed on scene change (usually returning to the DeployUI or main menu). If this is an issue for your Effect,
+     * you should probably make your own GameObject.
+     */
     public class EffectAfterTime : MonoBehaviour 
     {
         public static List<KeyValuePair<MethodInfo, Timer>> effectList;

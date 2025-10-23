@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using Harmony;
+﻿using Harmony;
 using SharedMemory;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace LiveStreamIntegration
@@ -22,9 +20,9 @@ namespace LiveStreamIntegration
         public static Dictionary<string, int> recordedUserVotes;
         public static Dictionary<int, int> recordedOptionVotes;
         public static List<Effect> effects;
-        public static float voteTimer;
         public static bool isVotingActive = false;
         public static Effect[] currentVotableEffects;
+        public static bool isVotingTimeInRealTime = false;
         public Harmony_Patch() 
         {
             // Make the CircularBuffer that the mod uses to communicate with Streamer.Bot, or load it if it already exists
@@ -36,7 +34,6 @@ namespace LiveStreamIntegration
             {
                 buffer = new CircularBuffer("LobotomyCorporationLivestreamIntegration");
             }
-            voteTimer = Constants.MAX_VOTE_TIME;
             recordedOptionVotes = new Dictionary<int, int>();
             recordedUserVotes = new Dictionary<string, int>();
             effects = Effect.LoadEffects();
@@ -61,8 +58,8 @@ namespace LiveStreamIntegration
             ResetOptionVotes(recordedOptionVotes);
             ResetUserVotes(recordedUserVotes);
             UpdateVoteUINames();
-            voteTimer = Constants.MAX_VOTE_TIME;
-            votingUI.SetVoteTime((int)Constants.MAX_VOTE_TIME);
+            votingUI.voteTime = Constants.MAX_VOTE_TIME;
+            votingUI.SetDisplayVoteTime((int)Constants.MAX_VOTE_TIME);
         }
         public static void DestroyVoteUI()
         {
@@ -79,6 +76,7 @@ namespace LiveStreamIntegration
             for (int i = 0; i < Constants.NUM_VOTING_OPTIONS; i++)
             {
                 optionVotes[i] = 0;
+                votingUI.voteOptions[i].SetNumVotes(0);
             }
         }
         public static void ResetUserVotes(Dictionary<string, int> userVotes)
@@ -130,28 +128,11 @@ namespace LiveStreamIntegration
                     votingUI.voteOptions[i].SetNumVotes(recordedOptionVotes[i]);
                 }
             }
-            if (isVotingActive)
-            {
-                voteTimer -= Time.deltaTime; 
-                if (voteTimer < 0)
-                {
-                    voteTimer = Constants.MAX_VOTE_TIME;
-                    RunWinningEffect();
-                    InitVoting();
-                    if (votingUI is null)
-                    {
-                        return;
-                    }
-                    for (int i = 0; i < Constants.NUM_VOTING_OPTIONS; i++)
-                    {
-                        votingUI.voteOptions[i].SetNumVotes(recordedOptionVotes[i]);
-                    }
-                }
-                if (!(votingUI is null))
-                {
-                    votingUI.SetVoteTime(((int)voteTimer));
-                }
-            }
+        }
+        public static void OnVoteTimerEnd()
+        {
+            RunWinningEffect();
+            InitVoting();
         }
         public static void StartVoteUI()
         {
@@ -180,11 +161,13 @@ namespace LiveStreamIntegration
             Effect[] retval = new Effect[Constants.NUM_VOTING_OPTIONS];
             foreach (var i in effects)
             {
-                if (i.isEnabled)
+                // if the Effect is enabled and its votable condition is true, add it to the pool
+                if (i.IsVotable())
                 {
                     effectPool.Add(i);
                 }
             }
+            // Get (the desired amount of) random options from the voting pool. These are the new options to vote on.
             for (int i = 0; i < Constants.NUM_VOTING_OPTIONS; i++)
             {
                 int randomEffect = UnityEngine.Random.Range(0, effectPool.Count);
