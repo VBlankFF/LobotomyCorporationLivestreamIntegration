@@ -52,6 +52,7 @@ namespace LiveStreamIntegration
                 timerText.alignment = TextAnchor.LowerCenter;
                 voteCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
                 voteOptions = new VoteOptionRow[Constants.NUM_VOTING_OPTIONS];
+                // I don't know why setting the position of this and the top text is different. transform vs recttransform? dark magicks?
                 voteOptions[0] = new VoteOptionRow("1", "Option1", new Vector2(Screen.width - 290, 85));
                 voteOptions[0].voteOptionRowObj.transform.SetParent(voteCanvasObject.transform);
                 voteOptions[1] = new VoteOptionRow("2", "Option2", new Vector2(Screen.width - 290, 60));
