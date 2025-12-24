@@ -100,10 +100,12 @@ namespace LiveStreamIntegration
         public static void FakeDeath()
         {
             IList<AgentModel> agentList = AgentManager.instance.GetAgentList();
+            if (agentList is null || agentList.Count == 0) return;
             AgentModel fakeDeadAgent = agentList[UnityEngine.Random.Range(0, agentList.Count)];
             SefiraMessage sefiraMessage = new SefiraMessage();
             string d = sefiraMessage.desc;
             Sefira agentSefira = fakeDeadAgent.GetCurrentSefira();
+            if (agentSefira is null) return;
             int sefiraIndex = agentSefira.index;
             if (SefiraConversationController.Instance.CheckMuted(sefiraIndex))
             {
