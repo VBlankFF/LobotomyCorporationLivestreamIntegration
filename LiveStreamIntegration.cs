@@ -177,26 +177,40 @@ namespace LiveStreamIntegration
         {
             List<Effect> effectPool = new List<Effect>();
             Effect[] retval = new Effect[Constants.NUM_VOTING_OPTIONS];
+            int numEffectsSelected = 0;
+            // Add all enabled effects to the pool
             foreach (var i in effects)
             {
-                // if the Effect is enabled and its votable condition is true, add it to the pool
-                if (i.IsVotable())
-                {
-                    effectPool.Add(i);
-                }
+                // We don't check its condition here in the hopes that we can save CPU by not having to run some (potentially costly) checks
+                if (i.isEnabled) effectPool.Add(i);
             }
-            // Get (the desired amount of) random options from the voting pool. These are the new options to vote on.
-            for (int i = 0; i < Constants.NUM_VOTING_OPTIONS; i++)
+            // Choose a random effect, add it to the list if it's valid, and remove it from this Effect pool.
+            while (numEffectsSelected < Constants.NUM_VOTING_OPTIONS)
             {
+                // If there's no effects left in the pool, just fill the remaining slots with Effects that do nothing
+                if (effectPool.Count == 0)
+                {
+                    retval[numEffectsSelected] = new Effect(null, "Nothing");
+                    numEffectsSelected++;
+                    continue;
+                }
                 int randomEffect = UnityEngine.Random.Range(0, effectPool.Count);
-                retval[i] = effectPool[randomEffect];
+                // If the Effect is enabled and its votable condition is true, use it
+                if (randomEffect.IsVotable())
+                {
+                    retval[numEffectsSelected] = effectPool[randomEffect];
+                    numEffectsSelected++;
+                }
+                // Remove the Effect from the pool so it is not selected twice
                 effectPool.RemoveAt(randomEffect);
             }
+            // The Effects in the list are the new options to vote on.
             return retval;
         }
         // Selects the Effect with the most votes (lower numbers win ties) and invokes it
         public static void RunWinningEffect()
         {
+            if (!isVotingActive) return;
             Effect highestEffect = currentVotableEffects[0];
             int votesForHighest = recordedOptionVotes[0];
             // Get the effect with the most votes
@@ -208,7 +222,8 @@ namespace LiveStreamIntegration
                     votesForHighest = recordedOptionVotes[i];
                 }
             }
-            highestEffect.GetEffectMethod().Invoke(null, null);
+            MethodInfo effectMethod = highestEffect.GetEffectMethod();
+            if (effectMethod is not null) effectMethod.Invoke(null, null);
         }
         public static void MakeUI()
         {
