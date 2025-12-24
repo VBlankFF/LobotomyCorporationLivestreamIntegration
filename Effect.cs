@@ -67,6 +67,10 @@ namespace LiveStreamIntegration
         {
             return votableCondition;
         }
+        public EffectIdentity GetIdentity()
+        {
+            return new EffectIdentity(this.GetName(), this.GetEffectMethod().DeclaringType.Assembly.GetName().Name);
+        }
         /* Loads every dll in the Effects folder and adds their Effects to the list. If you are making a dll to add to the folder, ensure you have an
          EffectDefinitions class with a GetEffects method that returns an IEnumerable of Effects.*/
         public static List<Effect> LoadEffects()
@@ -97,6 +101,18 @@ namespace LiveStreamIntegration
                     LobotomyBaseMod.ModDebug.Log("LobotomyCorporationlivestreamIntegration failed to load Effect file " + file.Name + "\n" + "Error thrown: " + ex.Message);
                 }
             } 
+            foreach (Effect eff in effects)
+            {
+                EffectIdentity ident = eff.GetIdentity();
+                if (!Settings.effectSettings.TryGetValue(ident, out bool setting))
+                {
+                    Settings.effectSettings[ident] = eff.IsEnabled();
+                }
+                else
+                {
+                    eff.isEnabled = setting;
+                }
+            }
             return effects;
         }
         // Adds an Effect to the Effect list. Use only for mods with Effects that aren't added to the Effects folder.
@@ -106,6 +122,15 @@ namespace LiveStreamIntegration
             {
                 LobotomyBaseMod.ModDebug.Log("LobotomyCorporationlivestreamIntegration: ExternalLoadEffect received null Effect");
                 return;
+            }
+            EffectIdentity ident = externalEffect.GetIdentity();
+            if (!Settings.effectSettings.TryGetValue(ident, out bool setting))
+            {
+                Settings.effectSettings[ident] = externalEffect.IsEnabled();
+            }
+            else
+            {
+                externalEffect.isEnabled = setting;
             }
             Harmony_Patch.effects.Add(externalEffect);
         }
@@ -123,6 +148,15 @@ namespace LiveStreamIntegration
                 {
                     LobotomyBaseMod.ModDebug.Log("LobotomyCorporationlivestreamIntegration: ExternalLoadEffects received a null Effect");
                     continue;
+                }
+                EffectIdentity ident = eff.GetIdentity();
+                if (!Settings.effectSettings.TryGetValue(ident, out bool setting))
+                {
+                    Settings.effectSettings[ident] = eff.IsEnabled();
+                }
+                else
+                {
+                    eff.isEnabled = setting;
                 }
                 Harmony_Patch.effects.Add(eff);
             }

@@ -42,7 +42,10 @@ namespace LiveStreamIntegration
             }
             recordedOptionVotes = new Dictionary<int, int>();
             recordedUserVotes = new Dictionary<string, int>();
+            Settings.LoadSettings();
+            Settings.LoadEffectSettings();
             effects = Effect.LoadEffects();
+            Settings.SaveEffectSettings();
             currentVotableEffects = new Effect[Constants.NUM_VOTING_OPTIONS];
             HarmonyInstance HInstance = HarmonyInstance.Create("LobotomyCorporationLivestreamIntegration");
             HarmonyMethod getAllFromBuffer = new HarmonyMethod(typeof(Harmony_Patch).GetMethod("GetAllFromBuffer"));
@@ -201,7 +204,7 @@ namespace LiveStreamIntegration
                 }
                 int randomEffect = UnityEngine.Random.Range(0, effectPool.Count);
                 // If the Effect is enabled and its votable condition is true, use it
-                if (randomEffect.IsVotable())
+                if (effectPool[randomEffect].IsVotable())
                 {
                     retval[numEffectsSelected] = effectPool[randomEffect];
                     numEffectsSelected++;
@@ -228,7 +231,7 @@ namespace LiveStreamIntegration
                 }
             }
             MethodInfo effectMethod = highestEffect.GetEffectMethod();
-            if (effectMethod is not null) effectMethod.Invoke(null, null);
+            effectMethod?.Invoke(null, null);
         }
         public static void MakeUI()
         {
