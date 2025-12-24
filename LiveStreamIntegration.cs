@@ -16,10 +16,14 @@ namespace LiveStreamIntegration
     }
     public class Harmony_Patch
     {
+        // The buffer that Streamer.Bot (or any other thing that handles the votes, I guess?) writes votes to
         public static CircularBuffer buffer;
         public static VoteUI votingUI;
+        // The vote of each user, by Id
         public static Dictionary<string, int> recordedUserVotes;
+        // The number of votes for each option (option, numVotes)
         public static Dictionary<int, int> recordedOptionVotes;
+        // Every single loaded Effect (enabled or disabled)
         public static List<Effect> effects;
         public static bool isVotingActive = false;
         public static Effect[] currentVotableEffects;
@@ -29,6 +33,7 @@ namespace LiveStreamIntegration
             // Make the CircularBuffer that the mod uses to communicate with Streamer.Bot, or load it if it already exists
             try
             {
+                // This is probably super overkill
                 buffer = new CircularBuffer("LobotomyCorporationLivestreamIntegration", 2000, 50);
             }
             catch
