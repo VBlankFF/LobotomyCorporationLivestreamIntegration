@@ -21,7 +21,7 @@ namespace LiveStreamIntegration.SettingsUI
             rect.pivot = new Vector2(0.5f, 0.5f);
             rect.sizeDelta = new Vector2(400, 570);
             Image thisImage = gameObject.AddComponent<Image>();
-            thisImage.sprite = (Sprite)Resources.Load("UI", typeof(Sprite));
+            thisImage.sprite = MakeUI.UI;
             thisImage.material = MakeUI.Norwester.material;
             thisImage.color = new Color(0f, 0f, 0f);
             upperPanel = new GameObject("SUpperPanel");

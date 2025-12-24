@@ -26,7 +26,7 @@ namespace LiveStreamIntegration.SettingsUI
             rect.sizeDelta = new Vector2(408, 360);
             transform.localPosition = new Vector3(0, -35);
             Image thisImage = gameObject.AddComponent<Image>();
-            thisImage.sprite = (Sprite)Resources.Load("Background", typeof(Sprite));
+            thisImage.sprite = MakeUI.Background;
             thisImage.type = Image.Type.Sliced;
             thisImage.fillCenter = false;
             thisImage.material = MakeUI.Norwester.material;
@@ -76,7 +76,7 @@ namespace LiveStreamIntegration.SettingsUI
             scrollBarRect.anchorMax = new Vector2(1f, 1f);
             scrollBarRect.pivot = new Vector2(1f, 1f);
             scrollBarRect.localScale = new Vector3(1, 1, 1);
-            scrollBar.AddComponent<Image>().sprite = (Sprite)Resources.Load("Background", typeof(Sprite));
+            scrollBar.AddComponent<Image>().sprite = MakeUI.Background;
             scrollBar.GetComponent<Image>().type = Image.Type.Sliced;
 
 
@@ -102,13 +102,13 @@ namespace LiveStreamIntegration.SettingsUI
             handleRect.pivot = new Vector2(0.5f, 0.5f);
             handleRect.localScale = new Vector3(1, 1, 1);
             Image handleImage = handle.AddComponent<Image>();
-            handleImage.sprite = (Sprite)Resources.Load("Button", typeof(Sprite));
+            handleImage.sprite = MakeUI.Button;
             handleImage.type = Image.Type.Sliced;
             scrollBarBar.targetGraphic = handleImage;
             scrollBarBar.handleRect = handleRect;
-            for (; numRows < 100;)
+            foreach (Effect eff in LiveStreamIntegration.Harmony_Patch.effects)
             {
-                AddEffect(numRows.ToString());
+                AddEffect(eff);
             }
 
         }
@@ -118,7 +118,7 @@ namespace LiveStreamIntegration.SettingsUI
         {
 
         }
-        public void AddEffect(string name)
+        public void AddEffect(Effect eff)
         {
             GameObject effect = new GameObject("EffectRowUI");
             RectTransform effRect = effect.AddComponent<RectTransform>();
@@ -130,7 +130,12 @@ namespace LiveStreamIntegration.SettingsUI
             effRect.localScale = new Vector3(1, 1, 1);
             effRect.anchoredPosition = new Vector3(-1f, numRows * -40);
             EffectRowUI row = effect.AddComponent<EffectRowUI>();
-            row.effectNameText.text = name;
+            row.associatedEffect = eff;
+            row.effectNameText.text = eff.name;
+            if (!eff.isEnabled)
+            {
+                row.toggleEnabledButton.ForceOff();
+            }
             numRows++;
             contentrect.sizeDelta = new Vector2(390, numRows * 40);
         }

@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +13,8 @@ namespace LiveStreamIntegration.SettingsUI
         public ToggleButton toggleEnabledButton;
         public GameObject effectName;
         public Text effectNameText;
+        public Effect associatedEffect;
+        protected static MethodInfo onPress = typeof(EffectRowUI).GetMethod("OnToggle");
         RectTransform effectNameRect;
         // Use this for initialization
         void Awake()
@@ -18,11 +22,13 @@ namespace LiveStreamIntegration.SettingsUI
             toggleEnabled = new GameObject("EffectEnabledButton");
             toggleEnabled.transform.SetParent(this.transform);
             toggleEnabledButton = toggleEnabled.AddComponent<ToggleButton>();
+            toggleEnabledButton.parent = this;
+            toggleEnabledButton.OnPress = onPress;
             toggleEnabled.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
             effectName = new GameObject("EffectName");
             effectName.transform.SetParent(this.transform);
             effectNameText = effectName.AddComponent<Text>();
-            Font effFont = (Font)Resources.Load(@"NORWESTER", typeof(Font));
+            Font effFont = MakeUI.Norwester;
             effectNameText.font = effFont;
             effectNameRect = effectName.GetComponent<RectTransform>();
             effectName.transform.localPosition = new Vector2(40, 0);
@@ -42,6 +48,11 @@ namespace LiveStreamIntegration.SettingsUI
         void Update()
         {
 
+        }
+
+        public void OnToggle(bool newState)
+        {
+            associatedEffect.isEnabled = newState;
         }
     }
 }

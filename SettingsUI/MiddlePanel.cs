@@ -21,7 +21,7 @@ namespace LiveStreamIntegration.SettingsUI
             rect.pivot = new Vector2(0.5f, 1f);
             rect.sizeDelta = new Vector2(408, 404);
             Image thisImage = gameObject.AddComponent<Image>();
-            thisImage.sprite = (Sprite)Resources.Load("Background", typeof(Sprite));
+            thisImage.sprite = MakeUI.Background;
             thisImage.material = MakeUI.Norwester.material;
             thisImage.color = new Color(62f / 255f, 252f / 255f, 164f / 255f);
             effectScrollPanel = new GameObject("SEffectScrollPanel");

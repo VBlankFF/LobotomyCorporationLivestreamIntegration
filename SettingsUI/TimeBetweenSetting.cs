@@ -47,7 +47,7 @@ namespace LiveStreamIntegration.SettingsUI
             timeInputRect.localScale = new Vector3(1, 1, 1);
             InputField input = timeInput.AddComponent<InputField>();
             Image timeInputImage = timeInput.AddComponent<Image>();
-            timeInputImage.sprite = (Sprite)Resources.Load("Background", typeof(Sprite));
+            timeInputImage.sprite = MakeUI.Background;
             timeInputImage.color = MakeUI.borderColor;
             timeInputImage.type = Image.Type.Sliced;
             timeInputImage.fillCenter = false;
@@ -77,5 +77,6 @@ namespace LiveStreamIntegration.SettingsUI
         {
 
         }
+        
     }
 }

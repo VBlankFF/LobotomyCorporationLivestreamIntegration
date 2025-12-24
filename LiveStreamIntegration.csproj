@@ -41,6 +41,9 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\LobotomyCorp\LobotomyCorp_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="LobotomyBaseModLib">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\LobotomyCorp\LobotomyCorp_Data\Managed\LobotomyBaseModLib.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Security">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\LobotomyCorp\LobotomyCorp_Data\Managed\Mono.Security.dll</HintPath>
     </Reference>
@@ -207,6 +210,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Settings.cs" />
     <Compile Include="SettingsUI\*.cs" />
     <Compile Include="Effect.cs" />
     <Compile Include="LiveStreamIntegration.cs" />

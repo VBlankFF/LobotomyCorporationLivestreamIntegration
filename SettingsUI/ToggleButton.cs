@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 
 namespace LiveStreamIntegration.SettingsUI
 {
@@ -12,6 +13,8 @@ namespace LiveStreamIntegration.SettingsUI
         public Button button;
         public bool on;
         public Image backLightImage;
+        public MethodInfo OnPress;
+        public System.Object parent;
         // Use this for initialization
         void Awake()
         {
@@ -24,7 +27,7 @@ namespace LiveStreamIntegration.SettingsUI
             backLightRect.sizeDelta = new Vector2(40, 40);
             backLightRect.localScale = new Vector3(1, 1, 1);
             backLightImage = gameObject.AddComponent<Image>();
-            backLightImage.sprite = (Sprite)Resources.Load("Background", typeof(Sprite));
+            backLightImage.sprite = MakeUI.Background;
             backLightImage.type = Image.Type.Sliced;
             backLightImage.color = new Color(255 / 255f, 255 / 255f, 161 / 255f, 255f / 255f);
             buttonObj = new GameObject("ToggleButton");
@@ -38,7 +41,7 @@ namespace LiveStreamIntegration.SettingsUI
             buttonRect.localScale = new Vector3(1, 1, 1);
             buttonRect.anchoredPosition = new Vector2(0, 0);
             Image buttonImage = buttonObj.AddComponent<Image>();
-            buttonImage.sprite = (Sprite)Resources.Load("Button", typeof(Sprite));
+            buttonImage.sprite = MakeUI.Button;
             buttonImage.type = Image.Type.Sliced;
             button.targetGraphic = buttonImage;
             button.onClick.AddListener(OnClick);
@@ -49,15 +52,22 @@ namespace LiveStreamIntegration.SettingsUI
             {
                 backLightImage.color = new Color(25f / 255f, 255f / 255f, 255f / 255f, 87f / 255f);
                 on = false;
+                OnPress.Invoke(parent, new System.Object[] { false });
             }
             else
             {
                 backLightImage.color = new Color(255 / 255f, 255 / 255f, 161 / 255f, 255f / 255f);
                 on = true;
+                OnPress.Invoke(parent, new System.Object[] { true });
             }
         }
 
         // Update is called once per frame
+        public void ForceOff()
+        {
+            backLightImage.color = new Color(25f / 255f, 255f / 255f, 255f / 255f, 87f / 255f);
+            on = false;
+        }
         void Update()
         {
 

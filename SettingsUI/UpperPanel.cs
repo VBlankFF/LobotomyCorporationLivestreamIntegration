@@ -7,7 +7,6 @@ namespace LiveStreamIntegration.SettingsUI
 {
     public class UpperPanel : MonoBehaviour
     {
-
         public GameObject basePanel;
         public CanvasRenderer renderer;
         // Use this for initialization
@@ -21,7 +20,7 @@ namespace LiveStreamIntegration.SettingsUI
             rect.pivot = new Vector2(0.5f, 1f);
             rect.sizeDelta = new Vector2(400, 170);
             Image thisImage = gameObject.AddComponent<Image>();
-            thisImage.sprite = (Sprite)Resources.Load("UI", typeof(Sprite));
+            thisImage.sprite = MakeUI.UI;
             thisImage.material = MakeUI.Norwester.material;
             thisImage.color = new Color(0, 0, 0, 0);
             transform.localScale = new Vector3(1, 1, 1);
@@ -38,7 +37,7 @@ namespace LiveStreamIntegration.SettingsUI
             var topTextText = topText.AddComponent<Text>();
             topTextText.alignment = TextAnchor.UpperLeft;
             topTextText.verticalOverflow = VerticalWrapMode.Overflow;
-            topTextText.fontSize = 27;
+            topTextText.fontSize = 26;
             topTextText.color = new Color(62f / 255f, 252f / 255f, 164f / 255f);
             topTextText.font = MakeUI.Norwester;
             topTextText.text = "Livestream Integration Settings";

@@ -21,7 +21,7 @@ namespace LiveStreamIntegration.SettingsUI
             rect.localPosition = new Vector3(0, 0);
             rect.sizeDelta = new Vector2(408, 578);
             Image thisImage = gameObject.AddComponent<Image>();
-            thisImage.sprite = (Sprite)Resources.Load("UI", typeof(Sprite));
+            thisImage.sprite = MakeUI.UI;
             thisImage.material = MakeUI.Norwester.material;
             thisImage.color = new Color(62f / 255f, 252f / 255f, 164f / 255f);
             basePanel = new GameObject("SBasePanel");
