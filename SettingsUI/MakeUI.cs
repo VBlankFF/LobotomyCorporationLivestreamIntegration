@@ -16,7 +16,7 @@ namespace LiveStreamIntegration.SettingsUI
         public static Sprite Button;
         public static Sprite Background;
         // Use this for initialization
-        void Start()
+        public void Init()
         {
             AssetBundle uiBundle = Singleton<ModAssetBundleManager>.Instance.bundles["VBlankFF_LiveStreamIntegration"][0];
             UI = (Sprite)uiBundle.LoadAsset("UI", typeof(Sprite));

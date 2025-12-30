@@ -29,8 +29,10 @@ namespace LiveStreamIntegration
         }
         public static string configPath;
         public static Dictionary<EffectIdentity, bool> effectSettings = new Dictionary<EffectIdentity, bool>();
-        public static int TimeBetweenEffects { get; set; }
-        public static bool IsIngameTime { get; set; }
+        private static int _timeBetweenEffects;
+        private static bool _isIngameTime;
+        public static int TimeBetweenEffects { get { return _timeBetweenEffects; } set { _timeBetweenEffects = value; } }
+        public static bool IsIngameTime { get { return _isIngameTime; } set { _isIngameTime = value; } }
         public static void LoadSettings()
         {
             if (!File.Exists(configPath + CONFIG_NAME))

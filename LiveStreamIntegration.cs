@@ -59,8 +59,8 @@ namespace LiveStreamIntegration
             HInstance.Patch(typeof(GameManager).GetMethod("RestartGame", BindingFlags.Public | BindingFlags.Instance), null, destroyUI, null);
             HInstance.Patch(typeof(DeployUI).GetMethod("Init", BindingFlags.Public | BindingFlags.Instance), null, destroyUI, null);
             // Create the settings UI
-            HarmonyMethod settingsUI = new HarmonyMethod(typeof(HarmonyPatch).GetMethod("MakeUI"));
-            HInstance.Patch(typeof(AlterTitleController).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance), null, settingsUI, null);
+            HarmonyMethod settingsUI = new HarmonyMethod(typeof(Harmony_Patch).GetMethod("MakeUI"));
+            HInstance.Patch(typeof(GlobalGameManager).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance), null, settingsUI, null);
 
         }
         // Begins the voting process by enabling voting, resetting the votes and time, and selecting new options.
@@ -236,7 +236,8 @@ namespace LiveStreamIntegration
         public static void MakeUI()
         {
             GameObject MakeUIObj = new GameObject("Make Settings UI");
-            MakeUIObj.AddComponent<SettingsUI.MakeUI>();
+            MakeUIObj.AddComponent<SettingsUI.MakeUI>().Init();
+
         }
     }
 }

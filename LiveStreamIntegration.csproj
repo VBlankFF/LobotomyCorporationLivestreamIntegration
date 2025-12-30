@@ -221,4 +221,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>call "$(TargetDir)..\..\compile.bat"</PreBuildEvent>
+  </PropertyGroup>
 </Project>
