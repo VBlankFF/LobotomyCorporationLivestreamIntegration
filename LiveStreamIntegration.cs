@@ -16,10 +16,14 @@ namespace LiveStreamIntegration
     }
     public class Harmony_Patch
     {
+        // The buffer that Streamer.Bot (or any other thing that handles the votes, I guess?) writes votes to
         public static CircularBuffer buffer;
         public static VoteUI votingUI;
+        // The vote of each user, by Id
         public static Dictionary<string, int> recordedUserVotes;
+        // The number of votes for each option (option, numVotes)
         public static Dictionary<int, int> recordedOptionVotes;
+        // Every single loaded Effect (enabled or disabled)
         public static List<Effect> effects;
         public static bool isVotingActive = false;
         public static Effect[] currentVotableEffects;
@@ -29,6 +33,7 @@ namespace LiveStreamIntegration
             // Make the CircularBuffer that the mod uses to communicate with Streamer.Bot, or load it if it already exists
             try
             {
+                // This is probably super overkill
                 buffer = new CircularBuffer("LobotomyCorporationLivestreamIntegration", 2000, 50);
             }
             catch
@@ -37,7 +42,10 @@ namespace LiveStreamIntegration
             }
             recordedOptionVotes = new Dictionary<int, int>();
             recordedUserVotes = new Dictionary<string, int>();
+            Settings.LoadSettings();
+            Settings.LoadEffectSettings();
             effects = Effect.LoadEffects();
+            Settings.SaveEffectSettings();
             currentVotableEffects = new Effect[Constants.NUM_VOTING_OPTIONS];
             HarmonyInstance HInstance = HarmonyInstance.Create("LobotomyCorporationLivestreamIntegration");
             HarmonyMethod getAllFromBuffer = new HarmonyMethod(typeof(Harmony_Patch).GetMethod("GetAllFromBuffer"));
@@ -51,8 +59,8 @@ namespace LiveStreamIntegration
             HInstance.Patch(typeof(GameManager).GetMethod("RestartGame", BindingFlags.Public | BindingFlags.Instance), null, destroyUI, null);
             HInstance.Patch(typeof(DeployUI).GetMethod("Init", BindingFlags.Public | BindingFlags.Instance), null, destroyUI, null);
             // Create the settings UI
-            HarmonyMethod settingsUI = new HarmonyMethod(typeof(HarmonyPatch).GetMethod("MakeUI"));
-            HInstance.Patch(typeof(AlterTitleController).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance), null, settingsUI, null);
+            HarmonyMethod settingsUI = new HarmonyMethod(typeof(Harmony_Patch).GetMethod("MakeUI"));
+            HInstance.Patch(typeof(GlobalGameManager).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance), null, settingsUI, null);
 
         }
         // Begins the voting process by enabling voting, resetting the votes and time, and selecting new options.
@@ -177,26 +185,40 @@ namespace LiveStreamIntegration
         {
             List<Effect> effectPool = new List<Effect>();
             Effect[] retval = new Effect[Constants.NUM_VOTING_OPTIONS];
+            int numEffectsSelected = 0;
+            // Add all enabled effects to the pool
             foreach (var i in effects)
             {
-                // if the Effect is enabled and its votable condition is true, add it to the pool
-                if (i.IsVotable())
-                {
-                    effectPool.Add(i);
-                }
+                // We don't check its condition here in the hopes that we can save CPU by not having to run some (potentially costly) checks
+                if (i.isEnabled) effectPool.Add(i);
             }
-            // Get (the desired amount of) random options from the voting pool. These are the new options to vote on.
-            for (int i = 0; i < Constants.NUM_VOTING_OPTIONS; i++)
+            // Choose a random effect, add it to the list if it's valid, and remove it from this Effect pool.
+            while (numEffectsSelected < Constants.NUM_VOTING_OPTIONS)
             {
+                // If there's no effects left in the pool, just fill the remaining slots with Effects that do nothing
+                if (effectPool.Count == 0)
+                {
+                    retval[numEffectsSelected] = new Effect(null, "Nothing");
+                    numEffectsSelected++;
+                    continue;
+                }
                 int randomEffect = UnityEngine.Random.Range(0, effectPool.Count);
-                retval[i] = effectPool[randomEffect];
+                // If the Effect is enabled and its votable condition is true, use it
+                if (effectPool[randomEffect].IsVotable())
+                {
+                    retval[numEffectsSelected] = effectPool[randomEffect];
+                    numEffectsSelected++;
+                }
+                // Remove the Effect from the pool so it is not selected twice
                 effectPool.RemoveAt(randomEffect);
             }
+            // The Effects in the list are the new options to vote on.
             return retval;
         }
         // Selects the Effect with the most votes (lower numbers win ties) and invokes it
         public static void RunWinningEffect()
         {
+            if (!isVotingActive) return;
             Effect highestEffect = currentVotableEffects[0];
             int votesForHighest = recordedOptionVotes[0];
             // Get the effect with the most votes
@@ -208,12 +230,14 @@ namespace LiveStreamIntegration
                     votesForHighest = recordedOptionVotes[i];
                 }
             }
-            highestEffect.GetEffectMethod().Invoke(null, null);
+            MethodInfo effectMethod = highestEffect.GetEffectMethod();
+            effectMethod?.Invoke(null, null);
         }
         public static void MakeUI()
         {
             GameObject MakeUIObj = new GameObject("Make Settings UI");
-            MakeUIObj.AddComponent<SettingsUI.MakeUI>();
+            MakeUIObj.AddComponent<SettingsUI.MakeUI>().Init();
+
         }
     }
 }

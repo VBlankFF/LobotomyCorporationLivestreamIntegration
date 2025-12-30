@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info>
+	<ID>VBlankFF_LiveStreamIntegration</ID>
+	<Option>
+		<Type>Toggle</Type>
+		<Name>Use Ingame Time</Name>
+		<DefValue>true</DefValue>
+	</Option>
+	<Option>
+		<Type>Slider</Type>
+		<Name>Seconds Between Effects</Name>
+		<DefValue>120</DefValue>
+	</Option>
+</info>
