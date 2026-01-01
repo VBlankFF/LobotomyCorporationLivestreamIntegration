@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +8,7 @@ namespace LiveStreamIntegration.SettingsUI
 {
     public class TimeBetweenSetting : MonoBehaviour
     {
-
+        protected InputField input;
         // Use this for initialization
         void Awake()
         {
@@ -45,7 +46,10 @@ namespace LiveStreamIntegration.SettingsUI
             timeInputRect.sizeDelta = new Vector2(80, 40);
             timeInputRect.anchoredPosition = new Vector2(385, 0);
             timeInputRect.localScale = new Vector3(1, 1, 1);
-            InputField input = timeInput.AddComponent<InputField>();
+            input = timeInput.AddComponent<InputField>();
+            input.onValueChanged.AddListener(delegate { OnTimeInputChanged(); });
+            input.text = Settings.TimeBetweenEffects.ToString();
+            input.enabled = true;
             Image timeInputImage = timeInput.AddComponent<Image>();
             timeInputImage.sprite = MakeUI.Background;
             timeInputImage.color = MakeUI.borderColor;
@@ -60,9 +64,9 @@ namespace LiveStreamIntegration.SettingsUI
             timeTextRect.SetParent(timeInputRect);
             timeText.alignment = TextAnchor.MiddleCenter;
             timeText.fontSize = 26;
-            timeText.color = new Color(62f / 255f, 252f / 255f, 164f / 255f);
+            timeText.color = MakeUI.borderColor;
             timeText.font = MakeUI.Norwester;
-            timeText.text = "120";
+            timeText.text = Settings.TimeBetweenEffects.ToString();
             timeText.horizontalOverflow = HorizontalWrapMode.Overflow;
             timeText.verticalOverflow = VerticalWrapMode.Overflow;
             timeTextRect.anchorMin = new Vector2(0f, 0f);
@@ -70,13 +74,16 @@ namespace LiveStreamIntegration.SettingsUI
             timeTextRect.pivot = new Vector2(0.5f, 0.5f);
             timeTextRect.anchoredPosition = new Vector2(0, 0);
             timeTextRect.localScale = new Vector3(1, 1, 1);
+            //input.textComponent = timeText;
         }
-
-        // Update is called once per frame
-        void Update()
+        public void OnTimeInputChanged()
         {
-
+            if (!Int32.TryParse(input.text, out int result))
+            {
+                return;
+            }
+            Settings.TimeBetweenEffects = result;
+            Settings.SaveSettings();
         }
-        
     }
 }

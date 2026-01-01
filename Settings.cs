@@ -126,17 +126,44 @@ namespace LiveStreamIntegration
                     File.Create(configPath + EFFECT_CONFIG_NAME).Dispose();
                 }
                 XmlDocument config = new XmlDocument();
-                XmlElement root = config.CreateElement("config");
+                try
+                {
+                    config.Load(configPath + EFFECT_CONFIG_NAME);
+                }
+                catch (XmlException) { }
+                
+                XmlNode root;
+                if (!config.HasChildNodes)
+                {
+                    root = config.CreateElement("config");
+                    config.AppendChild(root);
+                }
+                else root = config.FirstChild;
                 foreach (KeyValuePair<EffectIdentity, bool> eff in effectSettings)
                 {
+                    bool exists = false;
                     EffectIdentity ident = eff.Key;
+                    // Try to find an existing entry in the settings for the Effect
+                    XmlNodeList existingSettings = root.ChildNodes;
+                    foreach (XmlElement element in existingSettings)
+                    {
+                        if (element.InnerText == ident.source && element.GetAttribute("name") == ident.name)
+                        {
+                            // If one exists, set its enabled value
+                            exists = true;
+                            element.SetAttribute("enabled", eff.Value.ToString());
+                            break;
+                        }
+                    }
+                    if (exists) continue;
+                    // If it doesn't exist, create it
                     XmlElement effElem = config.CreateElement("Effect");
                     effElem.SetAttribute("name", ident.name);
                     effElem.SetAttribute("enabled", eff.Value.ToString());
                     effElem.InnerText = ident.source;
                     root.AppendChild(effElem);
                 }
-                config.AppendChild(root);
+                
                 config.Save(configPath + EFFECT_CONFIG_NAME);
             }
             catch (Exception ex)
@@ -159,10 +186,15 @@ namespace LiveStreamIntegration
             this.name = name;
             this.source = source;
         }
-        public bool Equals(EffectIdentity other)
+        public override int GetHashCode()
+        {
+            return name.GetHashCode();
+        }
+        public override bool Equals(Object other)
         {
             if (other is null) return false;
-            return this.name.Equals(other.name) && this.source.Equals(other.source);
+            if (!(other is  EffectIdentity)) return false;
+            return this.name.Equals((other as EffectIdentity).name) && this.source.Equals((other as EffectIdentity).source);
         }
     }
 }

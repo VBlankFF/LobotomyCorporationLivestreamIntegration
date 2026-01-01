@@ -16,7 +16,7 @@ namespace LiveStreamIntegration
         // The method to be run when this Effect activates. The method should be static.
         public MethodInfo effectMethod;
         // The name to be displayed when this effect is a votable option
-        public string name;
+        public readonly string name;
         // If this effect can currently show up as an option for voting. This is intented to be used for a config, so you should avoid setting it yourself
         // outside of the constructor.
         public bool isEnabled;
@@ -69,7 +69,8 @@ namespace LiveStreamIntegration
         }
         public EffectIdentity GetIdentity()
         {
-            return new EffectIdentity(this.GetName(), this.GetEffectMethod().DeclaringType.Assembly.GetName().Name);
+            // Uses name instead of GetName because 
+            return new EffectIdentity(this.name, this.GetEffectMethod().DeclaringType.Assembly.GetName().Name);
         }
         /* Loads every dll in the Effects folder and adds their Effects to the list. If you are making a dll to add to the folder, ensure you have an
          EffectDefinitions class with a GetEffects method that returns an IEnumerable of Effects.*/

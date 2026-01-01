@@ -53,6 +53,8 @@ namespace LiveStreamIntegration.SettingsUI
         public void OnToggle(bool newState)
         {
             associatedEffect.isEnabled = newState;
+            Settings.effectSettings[associatedEffect.GetIdentity()] = newState;
+            Settings.SaveEffectSettings();
         }
     }
 }

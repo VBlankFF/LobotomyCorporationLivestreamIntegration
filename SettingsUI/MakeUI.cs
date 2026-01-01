@@ -57,7 +57,7 @@ namespace LiveStreamIntegration.SettingsUI
                 borderPanel.SetActive(false);
                 return;
             }
-            if (!GlobalGameManager.instance.loadingScreen.isLoading)
+            if (GlobalGameManager.instance.loadingScreen.isLoading)
             {
                 borderPanel.SetActive(false);
                 return;

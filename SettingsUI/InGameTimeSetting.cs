@@ -48,6 +48,7 @@ namespace LiveStreamIntegration.SettingsUI
         public static void ChangeSetting(bool newState)
         {
             Settings.IsIngameTime = newState;
+            Settings.SaveSettings();
         }
 
         // Update is called once per frame
