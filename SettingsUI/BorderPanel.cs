@@ -29,12 +29,5 @@ namespace LiveStreamIntegration.SettingsUI
             basePanel.AddComponent<BasePanel>();
             gameObject.AddComponent<GraphicRaycaster>();
         }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
     }
 }
