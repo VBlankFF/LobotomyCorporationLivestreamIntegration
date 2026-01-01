@@ -35,7 +35,7 @@ namespace LiveStreamIntegration
             Effect wideAgents = new Effect(typeof(EffectDefinitions).GetMethod("WideAgents", BindingFlags.Static | BindingFlags.Public), "Wide agents for 90s");
             effects.Add(wideAgents);
             Effect noPause = new Effect(typeof(EffectDefinitions).GetMethod("BlockPausing", BindingFlags.Static | BindingFlags.Public), "No pausing for 60s");
-            effects.Add(noPause);
+            //effects.Add(noPause);
             Effect wanderAgent = new Effect(typeof(EffectDefinitions).GetMethod("RandomWander", BindingFlags.Static | BindingFlags.Public), "Wandering agents");
             effects.Add(wanderAgent);
             // The name can't be much longer than this without it either taking 2 lines or overlapping the vote number (neither looks good)
@@ -49,6 +49,7 @@ namespace LiveStreamIntegration
             effects.Add(fakeDeath);
             Effect contractWorkers = new Effect(typeof(ContractWorkers).GetMethod("SummonContractWorkersEffect", BindingFlags.Static | BindingFlags.Public), "Hire contractors", votableCondition: typeof(ContractWorkers).GetMethod("CanDoEffect", BindingFlags.Static | BindingFlags.Public));
             effects.Add(contractWorkers);
+            Effect shieldAgents = new Effect(typeof(EffectDefinitions).GetMethod("ShieldWorkers", BindingFlags.Static | BindingFlags.Public), "Shield workers");
             return;
         }
         public static void NoBullets()
@@ -132,6 +133,15 @@ namespace LiveStreamIntegration
             string name = agentSefira.name;
             SefiraConversationController.Instance.UpdateConversation(CharacterResourceDataModel.instance.GetSefiraPortrait(agentSefira.sefiraEnum, false), CharacterResourceDataModel.instance.GetColor(name), d);
             AngelaConversation.instance.MakeDefaultFormatMessage(AngelaMessageState.AGENT_DEAD_HEALTH, (object)fakeDeadAgent);
+        }
+        public static void ShieldWorkers()
+        {
+            foreach (WorkerModel worker in WorkerManager.instance.GetWorkerList())
+            {
+                if (worker is null || worker.IsDead()) continue;
+                if (worker is AgentModel && !(worker as AgentModel).activated) continue;
+                worker.AddUnitBuf(new global::BarrierBuf(global::RwbpType.A, 100f, 30f));
+            }
         }
     }
     public class WideBuf : UnitBuf
@@ -315,6 +325,7 @@ namespace LiveStreamIntegration
                 for (int i = 0; i < workers.Length; i++)
                 {
                     AgentManager.instance.RemoveAgent(workers[i].instanceId);
+                    workers[i] = null;
                 }
             }
         }

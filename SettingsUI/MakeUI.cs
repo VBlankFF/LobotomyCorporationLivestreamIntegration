@@ -34,11 +34,5 @@ namespace LiveStreamIntegration.SettingsUI
             borderPanelObj.transform.SetParent(canv.transform);
             borderPanelObj.AddComponent<BorderPanel>();
         }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
     }
 }
