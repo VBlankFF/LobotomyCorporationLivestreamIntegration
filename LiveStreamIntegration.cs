@@ -12,7 +12,6 @@ namespace LiveStreamIntegration
     {
         public const int BUFFER_SIZE = 50;
         public const int NUM_VOTING_OPTIONS = 3;
-        public const float MAX_VOTE_TIME = 60f;
     }
     public class Harmony_Patch
     {
@@ -71,8 +70,8 @@ namespace LiveStreamIntegration
             ResetOptionVotes(recordedOptionVotes);
             ResetUserVotes(recordedUserVotes);
             UpdateVoteUINames();
-            votingUI.voteTime = Constants.MAX_VOTE_TIME;
-            votingUI.SetDisplayVoteTime((int)Constants.MAX_VOTE_TIME);
+            votingUI.voteTime = Settings.TimeBetweenEffects;
+            votingUI.SetDisplayVoteTime((int)Settings.TimeBetweenEffects);
         }
         // Deletes the Vote UI and stops voting (if the Vote UI exists)
         public static void DestroyVoteUI()
